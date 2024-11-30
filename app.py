@@ -50,7 +50,7 @@ def preprocess_image(file_path):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    print("Received request files:", request.files)  # Add this log for debugging
+    print("Received request files:", request.files)  # Log the request files
 
     if model is None:
         return jsonify({'status': 'error', 'message': 'Model not loaded'}), 500
@@ -74,13 +74,21 @@ def predict():
         
         # Preprocess the image and make prediction
         processed_image = preprocess_image(file_path)
-        predictions = model.predict(processed_image)
-        predicted_index = np.argmax(predictions, axis=1)[0]  # Get the class with highest probability
+        predictions = model.predict(processed_image)[0]
+        
+        # Prepare response
+        predicted_index = np.argmax(predictions)  # Get the class with highest probability
         predicted_class_name = CLASS_NAMES[predicted_index]  # Get the class name
         
-        # Return the predicted class as a response
+        # Combine class names with probabilities
+        class_probabilities = {
+            CLASS_NAMES[i]: float(prob) for i, prob in enumerate(predictions)
+        }
+
+        # Return the predicted class and probabilities as a response
         return jsonify({
-            'predicted_class': predicted_class_name  # Only returning class name
+            'predicted_class': predicted_class_name,
+            'class_probabilities': class_probabilities
         }), 200
     
     except Exception as e:
