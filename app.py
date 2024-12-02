@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import numpy as np
+import uuid  # Untuk membuat ID unik
 from datetime import datetime
 
 app = Flask(__name__)
@@ -76,19 +77,24 @@ def predict():
         processed_image = preprocess_image(file_path)
         predictions = model.predict(processed_image)[0]
         
-        # Prepare response
+        # Get the class with the highest probability
         predicted_index = np.argmax(predictions)  # Get the class with highest probability
         predicted_class_name = CLASS_NAMES[predicted_index]  # Get the class name
+        confidence = predictions[predicted_index]  # Get the probability
         
-        # Combine class names with probabilities
-        class_probabilities = {
-            CLASS_NAMES[i]: float(prob) for i, prob in enumerate(predictions)
-        }
+        # Generate a unique ID
+        unique_id = str(uuid.uuid4())
 
-        # Return the predicted class and probabilities as a response
+        # Return the result as a response
         return jsonify({
-            'predicted_class': predicted_class_name,
-            'class_probabilities': class_probabilities
+            'message': "Model is predicted successfully.",
+            'data': {
+                'id': unique_id,
+                'result': predicted_class_name,
+                'confidenceScore': round(confidence * 100, 2),  # Convert to percentage
+                'isAboveThreshold': bool(confidence >= 0.5),  # Ensure boolean type
+                'createdAt': datetime.now().isoformat() + 'Z'
+            }
         }), 200
     
     except Exception as e:
