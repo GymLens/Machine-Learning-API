@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Docker Image",
+            "type": "shell",
+            "command": "docker build --pull --rm -f \"Dockerfile\" -t machinelearningapi:latest \".\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
