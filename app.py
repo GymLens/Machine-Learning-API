@@ -86,7 +86,7 @@ def predict():
 
 @app.route('/generate-token', methods=['GET'])
 def generate_token_endpoint():
-    SERVICE_ACCOUNT_FILE = "path/to/service-account.json"  # Update the path
+    SERVICE_ACCOUNT_FILE = "./long-live.json"  # Update the path
     SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
     try:
